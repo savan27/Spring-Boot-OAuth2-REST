@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,35 +22,39 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private UserDetailsService userDetailsService;
-	
+
 	@Override
 	@Bean
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
 	}
-	
-	public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception{
+
+	public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService).passwordEncoder(encoder());
 	}
-	
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-			http
-				.csrf().disable()
-				.anonymous().disable()
-				.authorizeRequests()
-				.antMatchers("/api-docs/**").permitAll();
-	
+		http.csrf().disable()
+		.anonymous().disable()
+		.authorizeRequests()
+		.antMatchers("/oauth/token").permitAll();
+
 	}
-	
+
+	@Override
+	public void configure(WebSecurity web) {
+		web.ignoring().antMatchers("/");
+	}
+
 	@Bean
-    public TokenStore tokenStore() {
-        return new InMemoryTokenStore();
-    }
-	
+	public TokenStore tokenStore() {
+		return new InMemoryTokenStore();
+	}
+
 	@Bean
-    public BCryptPasswordEncoder encoder(){
-        return new BCryptPasswordEncoder();
-    }
+	public BCryptPasswordEncoder encoder() {
+		return new BCryptPasswordEncoder();
+	}
 }

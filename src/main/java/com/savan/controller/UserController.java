@@ -3,6 +3,7 @@ package com.savan.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,9 +20,15 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@RequestMapping(value = "/user",method = RequestMethod.GET)
 	public List<User> listUser(){
 		return userService.findAll();
+	}
+	
+	@RequestMapping(value = "/user/{username}",method = RequestMethod.GET)
+	public User findUser(@PathVariable(value = "username")String username) {
+		return userService.findByUsername(username);
 	}
 	
 	@RequestMapping(value = "/user",method = RequestMethod.POST)

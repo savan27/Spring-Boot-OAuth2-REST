@@ -1,10 +1,13 @@
 package com.savan.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -27,6 +30,10 @@ public class User {
 	
 	@Column
 	private int age;
+	
+	@OneToOne(cascade = CascadeType.PERSIST)
+	@JoinColumn(name = "role_id")
+	private Role role;
 
 	/**
 	 * @return the id
@@ -96,5 +103,19 @@ public class User {
 	 */
 	public void setAge(int age) {
 		this.age = age;
+	}
+
+	/**
+	 * @return the role
+	 */
+	public Role getRole() {
+		return role;
+	}
+
+	/**
+	 * @param role the role to set
+	 */
+	public void setRole(Role role) {
+		this.role = role;
 	}
 }

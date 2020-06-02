@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +22,11 @@ public class UserServiceImpl implements UserDetailsService,UserService{
 
 	@Autowired
 	private UserDao userDao;
+	
+	@Override
+	public User findByUsername(String username) {
+		return userDao.findByUsername(username);
+	}
 	
 	@Override
 	public User save(User user) {
@@ -39,19 +46,21 @@ public class UserServiceImpl implements UserDetailsService,UserService{
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		
-		User user = userDao.findByUsername(userId);
+		User user = userDao.findByUsername(username);
 		
 		if (user == null) {
 			throw new UsernameNotFoundException("Invalid username or password.");
 		}
 		
-		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), getAuthority());
+		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), getAuthority(user));
 	}
 	
-	private List<SimpleGrantedAuthority> getAuthority(){
-		return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
+	@Transactional
+	private List<SimpleGrantedAuthority> getAuthority(User user){
+		return Arrays.asList(new SimpleGrantedAuthority("ROLE_" + user.getRole().getRole()));
 	}
+
 
 }
